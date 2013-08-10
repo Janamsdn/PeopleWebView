@@ -1,135 +1,108 @@
 package com.jc.android.peoplewebview;
 
-import java.io.FilterInputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.jc.android.peoplewebview.R;
 
-
-
-
 import android.app.Activity;
-import android.app.ListActivity;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
+
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.net.Uri;
+
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+
 import android.widget.ImageView;
-import android.widget.ListView;
+
 import android.widget.TextView;
 
  public class EmployeeDetails extends Activity{
 
 	
-	protected TextView employeeNameText;
-	protected TextView titleText;
-	protected TextView bioText;
-    protected int employeeId;
-    protected int managerId;
+	 private TextView employeeNameText;
+	 private TextView titleText;
+	 private TextView bioText;
+	 private ImageView imgeIV;
    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.employee_details);
-           
+         // Get bundle data
         String name = getIntent().getStringExtra("name");
         String title = getIntent().getStringExtra("title");
         String imge = getIntent().getStringExtra("imge");
         String bio = getIntent().getStringExtra("biography");
-        
-	        employeeNameText = (TextView) findViewById(R.id.employeeName);
-	        ImageView  imgeIV =(ImageView)findViewById(R.id.imgeIV);
-	        titleText = (TextView) findViewById(R.id.titles);
-	        bioText = (TextView) findViewById(R.id.decc);
-	        
-	        employeeNameText.setText("Name:	"	+ name);
-	        titleText.setText("Title:		"+ title);
-	        bioText.setText("Biography:  "+"\n\n"+bio);        
-	
-	        Bitmap  bitmap;
-	        InputStream in = null;
-	        try {
-	        	in = new java.net.URL(imge).openStream();
-	        } catch (MalformedURLException e) {
-	        	// TODO Auto-generated catch block
-	        	e.printStackTrace();
-	        } catch (IOException e) {
-	        	// TODO Auto-generated catch block
-	        	e.printStackTrace();
-	        }
-	        bitmap = BitmapFactory.decodeStream(new SanInputStream(in));
-
-	      //clean existing image for Image control
-	        imgeIV.setImageDrawable(null);
-
-	        getRoundedShape(bitmap);
-	        imgeIV.setImageBitmap(getRoundedShape(bitmap));
-
+        //getView And SetData 
+	    getViewAndSetData(name, title, imge, bio);
 	       
     }
-    public class SanInputStream extends FilterInputStream {
-        public SanInputStream(InputStream in) {
-          super(in);
-        }
-        public long skip(long n) throws IOException {
-          long m = 0L;
-          while (m < n) {
-            long _m = in.skip(n-m);
-            if (_m == 0L) break;
-            m += _m;
-          }
+	private void getViewAndSetData(String name, String title, String imge,
+			String bio) {
+		//get view by id
+		employeeNameText = (TextView) findViewById(R.id.employeeName);
+		  imgeIV =(ImageView)findViewById(R.id.imgeIV);
+		titleText = (TextView) findViewById(R.id.titles);
+		bioText = (TextView) findViewById(R.id.decc);
+		// set text
+		employeeNameText.setText("Name:	"	+ name);
+		titleText.setText("Title:		"+ title);
+		bioText.setText("Biography:  "+"\n"+bio);        
+        // prepare your image to circle and set to image view
+		Bitmap  bitmap;
+		InputStream in = null;
+		try {
+			in = new java.net.URL(imge).openStream();
+		} catch (MalformedURLException e) {
+			
+			e.printStackTrace();
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		// decode stream
+		bitmap = BitmapFactory.decodeStream(in);
 
-          return m;
-        }
-  }
+       //clean existing image for Image control
+		imgeIV.setImageDrawable(null);
+		//get image in circular shape
+		getRoundedShape(bitmap);
+		//set Image 
+		imgeIV.setImageBitmap(getRoundedShape(bitmap));
+	}
+    
+
     /*
      * Making image in circular shape
      */
     public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
-     // TODO Auto-generated method stub
+     //targetWidth
      int targetWidth = 150;
      int targetHeight = 150;
+     //createBitmap
      Bitmap targetBitmap = Bitmap.createBitmap(targetWidth, 
-                               targetHeight,Bitmap.Config.ARGB_8888);
-     
-                   Canvas canvas = new Canvas(targetBitmap);
+                           targetHeight,Bitmap.Config.ARGB_8888);
+     // create canvas
+     Canvas canvas = new Canvas(targetBitmap);
+     //  calculate Circle
      Path path = new Path();
-     path.addCircle(((float) targetWidth - 1) / 2,
-     ((float) targetHeight - 1) / 2,
-     (Math.min(((float) targetWidth), 
-                   ((float) targetHeight)) / 2),
-             Path.Direction.CCW);
+     path.addCircle(((float) targetWidth - 1) / 2, ((float) targetHeight - 1) / 2,
+    		 		(Math.min(((float) targetWidth), ((float) targetHeight)) / 2),
+    		 		Path.Direction.CCW);  
+     //clip with the specified path
+     canvas.clipPath(path);
      
-                   canvas.clipPath(path);
      Bitmap sourceBitmap = scaleBitmapImage;
-     canvas.drawBitmap(sourceBitmap, 
-                                   new Rect(0, 0, sourceBitmap.getWidth(),
-       sourceBitmap.getHeight()), 
-                                   new Rect(0, 0, targetWidth,
-       targetHeight), null);
-     
-     
+     //Circle draw
+     canvas.drawBitmap(sourceBitmap, new Rect(0, 0, sourceBitmap.getWidth(),
+    		 		   sourceBitmap.getHeight()), new Rect(0, 0, targetWidth,
+    		 		  targetHeight), null);  
      return targetBitmap;
     }
 

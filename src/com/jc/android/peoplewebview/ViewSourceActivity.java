@@ -1,6 +1,4 @@
 package com.jc.android.peoplewebview;
-
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,67 +13,60 @@ import org.jsoup.nodes.Element;
 
 import android.app.Activity;
 
-import android.content.Context;
 import android.content.Intent;
 
 import android.os.Bundle;
 
 import android.view.View;
 
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
+
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 
 public class ViewSourceActivity extends Activity  {
-	private WebView web;
-	private static ArrayList<People> peopleArrayList;
 	
+	private static ArrayList<People> peopleArrayList;
 	protected ListAdapter adapter;
-	private ArrayAdapter<String> mAdapter = null;
-	private ArrayAdapter arrayAdapter;
 	ListView lv;
-	private Context context;
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);  
-        
-        extract();
-     // Get a handle to the list view
+        // from values
+        String[] from = new String[] {"Name", "title",};
+        // to values
+        int[] to = new int[] { R.id.empname, R.id.jobtitle,  };
+        // extract WebViewsource through Jsoup lib
+        extractWebViewsource();
+        // Get a handle to the list view
          lv = (ListView) findViewById(R.id.list);
-     // fill in the grid_item layout 
-      // create the grid item mapping
-         String[] from = new String[] {"firstName", "title",};
-         int[] to = new int[] { R.id.firstName, R.id.lastName,  };
-         
+         // get name and title from people Array List
         List<HashMap<String, String>> fillMaps = new ArrayList<HashMap<String, String>>();
         for(int i = 0; i < peopleArrayList.size(); i++){
             HashMap<String, String> map = new HashMap<String, String>();
-            //map.put("rowid", "" + i);
-            map.put("firstName","Name	: 	"+ peopleArrayList.get(i).getName());
-            map.put("title", "Title  	:   "+ peopleArrayList.get(i).getManagement());
+            map.put("Name","Name	: 	"+ peopleArrayList.get(i).getName());
+            map.put("title", "Title  	:   "+ peopleArrayList.get(i).getTitle());
             fillMaps.add(map);
         }
         
-        // fill in the grid_item layout
+        // fill in  layout
         SimpleAdapter adapter = new SimpleAdapter(this, fillMaps, R.layout.employee_list_item, from, to);
         lv.setAdapter(adapter);
+        // setOnItemClickListener
         lv.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> myAdapter, View myView, int myItemInt, long mylng) {
-            	
+                // get values from selected name
             	String name=peopleArrayList.get(myItemInt).getName().toString();
-        		String title=peopleArrayList.get(myItemInt).getManagement().toString();
+        		String title=peopleArrayList.get(myItemInt).getTitle().toString();
         		String imge=peopleArrayList.get(myItemInt).getPhoto().toString();
        			String biography=peopleArrayList.get(myItemInt).getBiography().toString();
-       			
-            	//ViewSourceActivity d = (ViewSourceActivity)context;
+       			// call EmployeeDetails intent
             	Intent intent = new Intent(myView.getContext(),EmployeeDetails.class);
-            	
        			intent.putExtra("name",name);
                 intent.putExtra("title",title);
                 intent.putExtra("imge",imge);
@@ -86,8 +77,11 @@ public class ViewSourceActivity extends Activity  {
     }
         
 
-   
-	private void extract() {
+   //extractWebViewsource
+	private void extractWebViewsource() {
+		peopleArrayList= new ArrayList<People>();
+		ArrayList<String> header=new ArrayList<String>();
+		
 		// Connect to the website and parse it into a document
         Document doc = null;
          try {
@@ -97,16 +91,15 @@ public class ViewSourceActivity extends Activity  {
 			e.printStackTrace();
 			
 		}
-		
-		peopleArrayList= new ArrayList<People>();
-		ArrayList<String> header=new ArrayList<String>();
-		
+         // select image source
 		for( Element element : doc.select("img") )
 		{
 			People p=new People();
+			// set absUrl for image
 			p.setPhoto(element.absUrl("src"));
-			
+			// select parent element
 			Element divGuarantee = element.parent();
+			//get header values and set to object
 			 for( Element pelement : divGuarantee.select("h3") )
 			 { 
 				  header.add(pelement.text());
@@ -115,10 +108,11 @@ public class ViewSourceActivity extends Activity  {
 			    String[] stockArr = new String[header.size()];
 			    stockArr = header.toArray(stockArr);
 			    p.setName(stockArr[0].toString());
-			    p.setManagement(stockArr[1].toString());
+			    p.setTitle(stockArr[1].toString());
 			    header.clear();
+			    //set Biography
 			 p.setBiography(divGuarantee.select("p").first().text());
-			 
+			 //fill array
 			 peopleArrayList.add(p);
 		}
 	

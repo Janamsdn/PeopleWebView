@@ -18,9 +18,9 @@ public final class R {
     public static final class id {
         public static final int decc=0x7f050003;
         public static final int employeeName=0x7f050001;
-        public static final int firstName=0x7f050004;
+        public static final int empname=0x7f050004;
         public static final int imgeIV=0x7f050000;
-        public static final int lastName=0x7f050005;
+        public static final int jobtitle=0x7f050005;
         public static final int list=0x7f050006;
         public static final int titles=0x7f050002;
     }

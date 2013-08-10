@@ -2,6 +2,6 @@
 <resources>
 
     <string name="hello">Hello World, HTMLViewActivity!</string>
-    <string name="app_name">Load People View</string>
+    <string name="app_name">Who\'s Who App</string>
 
 </resources>

@@ -1,12 +1,15 @@
 package com.jc.android.peoplewebview;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class People {
 	
+private String title;
+private String photo;
+private String biography;
+private String name;
+private String management;
 
- 
 public String getName() {
 	return name;
 }
@@ -19,9 +22,6 @@ public String getManagement() {
 public void setManagement(String management) {
 	this.management = management;
 }
-private String name;
- private String management;
-
 
 public String getTitle() {
 	return title;
@@ -41,8 +41,6 @@ public String getBiography() {
 public void setBiography(String biography) {
 	this.biography = biography;
 }
- private String title;
- private String photo;
- private String biography;
+ 
 
 }
